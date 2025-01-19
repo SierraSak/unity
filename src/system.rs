@@ -69,6 +69,22 @@ impl<T> List<T> {
         add(self, element, method);
     }
 
+    pub fn insert(&mut self, index: i32, element: &'static mut T) {
+        let method = self.get_class()
+            .get_methods()
+            .iter()
+            .find(|method| method.get_name() == Some(String::from("Insert")))
+            .unwrap();
+        
+        let insert = unsafe {
+            std::mem::transmute::<_, extern "C" fn(&mut Self, index: i32, &'static mut T, &MethodInfo)>(
+                method.method_ptr,
+            )
+        };
+
+        insert(self, index, element, method);
+    }
+
     pub fn len(&self) -> usize {
         self.size as _
     }
